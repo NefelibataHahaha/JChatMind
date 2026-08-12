@@ -1,0 +1,4 @@
+﻿# macOS 压缩包解压产生的元数据
+__MACOSX/
+# 数据库导出文件
+/jchatmind_assert/
