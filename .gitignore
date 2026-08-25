@@ -2,3 +2,10 @@
 __MACOSX/
 # 数据库导出文件
 /jchatmind_assert/
+
+# 环境变量与本地敏感配置（切勿提交真实密钥）
+.env
+.env.*
+!.env.example
+**/application-local.yaml
+**/application-local.yml

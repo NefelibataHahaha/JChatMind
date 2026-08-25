@@ -1,16 +1,18 @@
 spring:
   application:
     name: jchatmind
+  profiles:
+    include: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/jchatmind
-    username: postgres
-    password: 123456
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/jchatmind}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   mail:
     host: smtp.qq.com
     port: 587
-    username: your-email
-    password: your-password # 邮箱授权码
+    username: ${MAIL_USERNAME:your-email}
+    password: ${MAIL_PASSWORD:your-password} # 邮箱授权码
     default-encoding: UTF-8
     properties:
       mail:
@@ -21,11 +23,11 @@ spring:
             required: true
   ai:
     deepseek:
-      api-key: your-api-key
+      api-key: ${DEEPSEEK_API_KEY:your-api-key}
       base-url: https://api.deepseek.com
       chat:
         options:
-          model: deepseek-chat
+          model: deepseek-v4-flash
     zhipuai:
       api-key: your-api-key
       base-url: https://open.bigmodel.cn/api/paas

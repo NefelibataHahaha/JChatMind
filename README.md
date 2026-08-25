@@ -216,4 +216,13 @@ JChatMind 用 SSE 做了：
 
 加入[知识星球](https://mp.weixin.qq.com/s/iUiIRYlJvNqTsvfQXwK6FA)后如果不满意，三天内（72h）可全额退款！
 
+## 环境变量配置（敏感信息脱敏说明）
 
+项目已对 `jchatmind/src/main/resources/application.yaml` 进行脱敏处理，真实密钥不再写入仓库，改为“占位符 + 环境变量”的方式：
+
+- `application.yaml` 中只保留 `键: ${ENV_VAR:默认值}` 形式的占位符，未设置环境变量时使用默认值（均为占位字符串）。
+- 本地开发可在 `jchatmind/src/main/resources/application-local.yaml`（已加入 `.gitignore`）中填写真实值，项目通过 `spring.profiles.include: optional:local` 自动加载；没有该文件时自动跳过，不影响启动。
+- 服务器部署时直接设置环境变量，例如 `DEEPSEEK_API_KEY=sk-xxx`、`MAIL_PASSWORD=xxx`。
+- 完整变量清单见仓库根目录 `.env.example`。
+
+> 重要：仓库历史提交中曾包含真实的 DeepSeek/智谱 API Key 和 QQ 邮箱授权码。即使现在已从源码删除，它们仍可以从 `git log` 中恢复。请务必到对应平台 **撤销/重置这些密钥**（DeepSeek 控制台、智谱开放平台、QQ 邮箱设置→账户→生成授权码），必要时可再用 `git filter-repo` 重写历史。
