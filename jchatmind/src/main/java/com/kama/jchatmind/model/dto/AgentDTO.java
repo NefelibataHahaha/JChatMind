@@ -35,7 +35,8 @@ public class AgentDTO {
     @Getter
     @AllArgsConstructor
     public enum ModelType {
-        DEEPSEEK_CHAT("deepseek-chat"),
+        DEEPSEEK_V4_FLASH("deepseek-v4-flash"),
+        DEEPSEEK_V4_PRO("deepseek-v4-pro"),
         GLM_4_6("glm-4.6");
 
         @JsonValue

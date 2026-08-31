@@ -53,7 +53,7 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({
     name: "智能体助手",
     description: "",
     systemPrompt: "你是一个很有用的智能体助手",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     allowedTools: [],
     allowedKbs: [],
     chatOptions: {
@@ -87,7 +87,7 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({
         name: "agent",
         description: "",
         systemPrompt: "",
-        model: "deepseek-chat",
+        model: "deepseek-v4-flash",
         allowedTools: [],
         allowedKbs: [],
         chatOptions: {
@@ -197,12 +197,16 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({
                   <Select
                     options={[
                       {
-                        value: "deepseek-chat",
-                        label: "deepseek-chat",
+                        value: "deepseek-v4-flash",
+                        label: "Deepseek V4 Flash",
+                      },
+                      {
+                        value: "deepseek-v4-pro",
+                        label: "Deepseek V4 Pro",
                       },
                       {
                         value: "glm-4.6",
-                        label: "glm-4.6",
+                        label: "Glm 4.6",
                       },
                     ]}
                     placeholder="请选择模型"

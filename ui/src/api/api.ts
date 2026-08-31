@@ -8,7 +8,10 @@ export interface ChatOptions {
   messageLength?: number;
 }
 
-export type ModelType = "deepseek-chat" | "glm-4.6";
+export type ModelType =
+  | "deepseek-v4-flash"
+  | "deepseek-v4-pro"
+  | "glm-4.6";
 
 export interface CreateAgentRequest {
   name: string;

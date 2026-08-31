@@ -23,6 +23,6 @@ public class CityTool implements Tool {
 
     @org.springframework.ai.tool.annotation.Tool(name = "getCity", description = "获取当前的城市")
     public String getCity() {
-        return "深圳";
+        return "成都";
     }
 }
