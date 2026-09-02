@@ -44,8 +44,7 @@ public class JChatMindFactory {
     private final ChatMessageFacadeService chatMessageFacadeService;
     private final ChatMessageConverter chatMessageConverter;
 
-    // 运行时 Agent 配置
-    private AgentDTO agentConfig;
+
 
     public JChatMindFactory(
             ChatClientRegistry chatClientRegistry,
@@ -76,8 +75,7 @@ public class JChatMindFactory {
     /**
      * 将数据库中存储的记忆恢复成 List<Message> 结构
      */
-    private List<Message> loadMemory(String chatSessionId) {
-        int messageLength = agentConfig.getChatOptions().getMessageLength();
+    private List<Message> loadMemory(String chatSessionId,int messageLength) {
         List<ChatMessageDTO> chatMessages = chatMessageFacadeService.getChatMessagesBySessionIdRecently(chatSessionId, messageLength);
         List<Message> memory = new ArrayList<>();
         for (ChatMessageDTO chatMessageDTO : chatMessages) {
@@ -117,8 +115,7 @@ public class JChatMindFactory {
 
     private AgentDTO toAgentConfig(Agent agent) {
         try {
-            agentConfig = agentConverter.toDTO(agent);
-            return agentConfig;
+            return agentConverter.toDTO(agent);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("解析 Agent 配置失败", e);
         }
@@ -198,7 +195,8 @@ public class JChatMindFactory {
             List<Message> memory,
             List<KnowledgeBaseDTO> knowledgeBases,
             List<ToolCallback> toolCallbacks,
-            String chatSessionId
+            String chatSessionId,
+            Integer maxMessages
     ) {
         ChatClient chatClient = chatClientRegistry.get(agent.getModel());
         if (Objects.isNull(chatClient)) {
@@ -210,7 +208,7 @@ public class JChatMindFactory {
                 agent.getDescription(),
                 agent.getSystemPrompt(),
                 chatClient,
-                agentConfig.getChatOptions().getMessageLength(),
+                maxMessages,
                 memory,
                 toolCallbacks,
                 knowledgeBases,
@@ -226,13 +224,22 @@ public class JChatMindFactory {
      */
     public JChatMind create(String agentId, String chatSessionId) {
         Agent agent = loadAgent(agentId);
-        AgentDTO agentConfig = toAgentConfig(agent);
-        List<Message> memory = loadMemory(chatSessionId);
+        //仅属于本次agent创建任务的配置，不保存到factory字段中
+        AgentDTO runtimeConfig = toAgentConfig(agent);
+        // JChatMind 内部允许 maxMessages 为 null，并会使用默认值 20
+        Integer maxMessages = runtimeConfig.getChatOptions() == null
+                ? null
+                : runtimeConfig.getChatOptions().getMessageLength();
+
+        // loadMemory 需要 int，因此这里也提供同样的默认值
+        int memoryLimit = maxMessages == null ? 20 : maxMessages;
+        //恢复当前会话的历史消息
+        List<Message> memory = loadMemory(chatSessionId, memoryLimit);
 
         // 解析 agent 的支持的知识库
-        List<KnowledgeBaseDTO> knowledgeBases = resolveRuntimeKnowledgeBases(agentConfig);
+        List<KnowledgeBaseDTO> knowledgeBases = resolveRuntimeKnowledgeBases(runtimeConfig);
         // 解析 agent 支持的工具调用
-        List<Tool> runtimeTools = resolveRuntimeTools(agentConfig);
+        List<Tool> runtimeTools = resolveRuntimeTools(runtimeConfig);
         // 将工具调用转换成 ToolCallback 的形式
         List<ToolCallback> toolCallbacks = buildToolCallbacks(runtimeTools);
 
@@ -241,7 +248,8 @@ public class JChatMindFactory {
                 memory,
                 knowledgeBases,
                 toolCallbacks,
-                chatSessionId
+                chatSessionId,
+                maxMessages
         );
     }
 }
