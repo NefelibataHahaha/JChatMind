@@ -5,12 +5,16 @@ import java.util.Arrays;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 /**
  * @TableName chunk_bge_m3
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChunkBgeM3 {
     private String id;
 
@@ -28,6 +32,7 @@ public class ChunkBgeM3 {
 
     private LocalDateTime updatedAt;
 
+    private Double distance;
     @Override
     public boolean equals(Object that) {
         if (this == that) {

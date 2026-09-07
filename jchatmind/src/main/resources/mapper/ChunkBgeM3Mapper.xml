@@ -13,6 +13,7 @@
         <result property="embedding" column="embedding" jdbcType="OTHER"/>
         <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
         <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        <result property="distance" column="distance" jdbcType="DOUBLE"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -91,10 +92,11 @@
                metadata,
                embedding,
                created_at,
-               updated_at
+               updated_at,
+               embedding <-> #{vectorLiteral}::vector AS distance
         FROM chunk_bge_m3
         WHERE kb_id = CAST(#{kbId} AS uuid)
-        ORDER BY embedding <-> #{vectorLiteral}::vector
+        ORDER BY distance
         LIMIT #{limit}
         ]]>
     </select>

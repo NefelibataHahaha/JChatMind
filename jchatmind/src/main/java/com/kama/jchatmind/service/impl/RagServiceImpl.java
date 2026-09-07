@@ -4,6 +4,7 @@ import com.kama.jchatmind.mapper.ChunkBgeM3Mapper;
 import com.kama.jchatmind.model.entity.ChunkBgeM3;
 import com.kama.jchatmind.service.RagService;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class RagServiceImpl implements RagService {
 
     // 封装本地的模型调用
@@ -51,6 +53,12 @@ public class RagServiceImpl implements RagService {
     public List<String> similaritySearch(String kbId, String title) {
         String queryEmbedding = toPgVector(doEmbed(title));
         List<ChunkBgeM3> chunks = chunkBgeM3Mapper.similaritySearch(kbId, queryEmbedding, 3);
+
+        log.info("RAG检索完成：kbId={},查询={},距离={}",
+                kbId,
+                title,
+                chunks.stream().map(ChunkBgeM3::getDistance).toList());
+
         return chunks.stream().map(ChunkBgeM3::getContent).toList();
     }
 

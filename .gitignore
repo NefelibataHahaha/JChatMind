@@ -1,9 +1,19 @@
-﻿# macOS 压缩包解压产生的元数据
+# 操作系统元数据
+.DS_Store
+Thumbs.db
+Desktop.ini
 __MACOSX/
-# 数据库导出文件
+
+# 根目录 IDE 与 Codex 临时状态
+/.idea/
+/.vscode/
+/.codex-log/
+
+# 本地数据与生成输出
 /jchatmind_assert/
-#Codex
+/jchatmind/output.txt
 /JChatMind-30天深度学习讲义.md
+
 # 环境变量与本地敏感配置（切勿提交真实密钥）
 .env
 .env.*
