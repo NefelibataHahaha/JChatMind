@@ -130,6 +130,15 @@ const AgentChatView: React.FC = () => {
     };
     es.onerror = (error) => {
       console.error("SSE error:", error);
+      setDisplayAgentStatus(false);
+      setAgentStatusText("");
+      setAgentStatusType(undefined);
+      setLoading(false);
+
+      antdMessage.error({
+        content: "实时连接已中断，正在尝试重新连接",
+        key: "sse-connection-error",
+      });
     };
 
     es.addEventListener("message", (event) => {
@@ -154,6 +163,15 @@ const AgentChatView: React.FC = () => {
         setDisplayAgentStatus(false);
         setAgentStatusText("");
         setAgentStatusType(undefined);
+      } else if (message.type === "AI_ERROR") {
+        setDisplayAgentStatus(false);
+        setAgentStatusText("");
+        setAgentStatusType(undefined);
+        setLoading(false);
+
+        antdMessage.error(
+          message.payload.statusText || "本轮处理失败，请稍后重试",
+        );
       } else {
         throw new Error(`Unknown message type: ${message.type}`);
       }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kama.jchatmind.message.SseMessage;
 import com.kama.jchatmind.service.SseService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class SseServiceImpl implements SseService {
@@ -32,11 +34,9 @@ public class SseServiceImpl implements SseService {
             throw new RuntimeException(e);
         }
 
-        emitter.onCompletion(() -> {
-            clients.remove(chatSessionId);
-        });
-        emitter.onTimeout(() -> clients.remove(chatSessionId));
-        emitter.onError((error) -> clients.remove(chatSessionId));
+        emitter.onCompletion(() -> clients.remove(chatSessionId, emitter));
+        emitter.onTimeout(() -> clients.remove(chatSessionId, emitter));
+        emitter.onError(error -> clients.remove(chatSessionId, emitter));
 
         return emitter;
     }
@@ -54,7 +54,8 @@ public class SseServiceImpl implements SseService {
                         .data(sseMessageStr)
                 );
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                clients.remove(chatSessionId, emitter);
+                log.warn("SSE 发送失败，已移除失效连接，chatSessionId={}", chatSessionId, e);
             }
         } else {
             throw new RuntimeException("No client found for chatSessionId: " + chatSessionId);
