@@ -1,4 +1,4 @@
-# JChatMind repository guidance
+# KnowFlow repository guidance
 
 ## Purpose
 
@@ -15,7 +15,7 @@ Default to Chinese for explanations. Keep code identifiers, commands, protocol f
 
 ## Repository map
 
-- `jchatmind/`: Java 17, Spring Boot 3.5, Spring AI, MyBatis, PostgreSQL/pgvector backend.
+- `knowflow/`: Java 17, Spring Boot 3.5, Spring AI, MyBatis, PostgreSQL/pgvector backend.
 - `ui/`: React 19, TypeScript, Vite, Ant Design frontend.
 - `examples/`: standalone data and HTML examples; not production application code.
 - `.env.example`: placeholder-only configuration contract. Real secrets belong in environment variables or ignored local configuration.
@@ -38,13 +38,13 @@ Choose checks proportional to the changed surface. Stop after the relevant check
 | Change | Required checks |
 | --- | --- |
 | Instructions, Skill, or Markdown only | `git diff --check`; validate changed Skills with the bundled `quick_validate.py` |
-| Backend Java/XML, no runtime integration | From `jchatmind/`: `./mvnw clean compile -DskipTests` (`.\mvnw.cmd` on Windows) |
-| Spring wiring or application context | Backend compile, then `./mvnw -Dtest=JchatmindApplicationTests test` |
+| Backend Java/XML, no runtime integration | From `knowflow/`: `./mvnw clean compile -DskipTests` (`.\mvnw.cmd` on Windows) |
+| Spring wiring or application context | Backend compile, then `./mvnw -Dtest=KnowFlowApplicationTests test` |
 | RAG SQL, persistence, or migrations | Backend checks plus a real PostgreSQL/pgvector integration check when the service is available |
 | Frontend TypeScript/React | From `ui/`: `npm run build` and `npm run lint` |
 | Cross-cutting behavior | Relevant backend and frontend checks, then the narrowest end-to-end exercise that covers the changed contract |
 
-`JChatMindV1Test` and `JChatMindV2Test` call an external chat model. Run them only when credentials, network access, and paid/external execution are explicitly in scope. If a check fails outside the changed surface, report it as a baseline or environment limit instead of silently editing unrelated code.
+`AgentRuntimeV1Test` and `AgentRuntimeV2Test` call an external chat model. Run them only when credentials, network access, and paid/external execution are explicitly in scope. If a check fails outside the changed surface, report it as a baseline or environment limit instead of silently editing unrelated code.
 
 ## Completion report
 

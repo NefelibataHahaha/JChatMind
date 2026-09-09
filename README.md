@@ -1,228 +1,87 @@
+# 知行 AI（KnowFlow）
 
-# AI智能体助手-JChatMind
+基于 Spring AI 的智能体与知识库问答平台。“知”代表知识检索，“行”代表工具调用与任务执行。
 
-最近很多录友在做 AI 项目，但我发现一个普遍问题：
+本项目基于程序员 Carl 的 JChatMind 项目进行个性化开发，保留原项目 MIT 版权与许可声明，详见 [LICENSE](LICENSE)。当前功能包含原项目能力与后续改动，不将全部功能归为个人原创。
 
-简历写着“接入大模型、实现聊天”。
+## 当前能力
 
-面试官一句话就能给你问懵：“**那你到底做了什么？不就是调 API 吗**？”
+- Agent 执行：通过 Think-Execute 循环组织模型推理、手动工具调用和后续对话。
+- 工具管理：支持数据库、文件、邮件、知识检索等工具；使用 `internalToolExecutionEnabled(false)` 手动编排工具执行。
+- 知识库：Markdown 文档解析、分块、向量生成及 PostgreSQL/pgvector 距离检索。
+- 多模型：通过 `ChatClientRegistry` 管理聊天模型客户端。
+- 实时展示：通过 SSE 向 React 前端推送执行状态、内容和失败通知。
 
-一个聊天对话框和agent 是有区别的。
+功能以当前源码为准；本项目未在此声明并发容量、响应延迟或检索准确率指标。
 
-我这次在[知识星球](https://programmercarl.com/other/kstar.html)里**更新一个Java Agent项目**：JChatMind（AI智能体助手）
+## 技术栈与目录
 
-JChatMind 是一个智能 AI Agent 系统，基于 Spring AI 框架构建，实现了自主决策、工具调用和知识库检索等核心能力。
+- 后端：Java 17、Spring Boot 3.5、Spring AI、MyBatis、PostgreSQL/pgvector。
+- 前端：React 19、TypeScript、Vite、Ant Design。
 
-系统采用 **Think-Execute 循环机制，能够理解复杂任务、规划执行步骤、调用外部工具，并基于 RAG 技术从知识库中检索相关信息，完成多步骤的复杂任务**。
+| 目录 | 内容 |
+| --- | --- |
+| `knowflow/` | Maven 后端工程 |
+| `ui/` | 前端应用 `knowflow-ui` |
+| `examples/` | 独立 HTML 示例 |
+| `.github/workflows/verify.yml` | 后端编译、上下文测试和前端构建 |
 
-它不是“聊天机器人”，而是 Agent：**能规划、能调用工具、能检索知识库、还能把执行过程实时推给前端**。
+Java 包名为 `io.github.nefelibatahahaha.knowflow`，启动类为 `KnowFlowApplication`。
 
-你做完它，面试官再问 AI 项目，你能讲的就不是“我接了个接口”，而是：
+核心调用路径：
 
-* 我实现了 Think-Execute 循环（自主决策）
-* 我实现了 工具调用框架（可扩展）
-* 我实现了 RAG + 向量检索（pgvector）
-* 我实现了 多模型切换架构（注册表模式）
-* 我实现了 SSE 实时推送（执行状态可视化）
+`ChatMessageController` → `ChatMessageFacadeServiceImpl` → `ChatEvent` → `ChatEventListener` → `AgentRuntimeFactory.create()` → `AgentRuntime.run()`
 
-### 项目演示
+## 本地运行
 
-![image](https://file1.kamacoder.com/i/web/2026-01-09_16-30-36.jpg)
+1. 准备 Java 17、Node.js/npm 和 PostgreSQL/pgvector，以及已有业务表结构。聊天与向量生成还需要相应模型服务。
+2. 参考根目录 `.env.example` 配置环境变量，或在 `knowflow/src/main/resources/application-local.yaml` 中配置本地参数。该文件被 Git 忽略，勿提交真实密钥。
+3. 当前配置包含 `local` profile。`.env.example` 是配置参考，Spring Boot 不会自动读取根目录 `.env`，需要通过终端或 IDE 注入环境变量。
+4. 从后端目录启动：
 
-![image](https://file1.kamacoder.com/i/web/2026-01-09_16-31-19.jpg)
+```powershell
+cd knowflow
+.\mvnw.cmd spring-boot:run
+```
 
-![image](https://file1.kamacoder.com/i/web/2026-01-09_16-31-49.jpg)
+5. 在另一个终端启动前端：
 
-![image](https://file1.kamacoder.com/i/web/2026-01-09_16-32-08.jpg)
+```powershell
+cd ui
+npm ci
+npm run dev
+```
 
-### 项目专栏目录
+前端当前访问 `http://localhost:8080/api`，浏览器地址以 Vite 启动输出为准。
 
-![](https://file1.kamacoder.com/i/web/2026-01-08_10-43-35.jpg)
+## 改名与兼容说明
 
-从理论基础：agent的基本概念
+- 产品名：知行 AI（KnowFlow）；Maven artifactId 和 Spring 应用名：`knowflow`。
+- 后端目录由 `jchatmind/` 改为 `knowflow/`，在 IDEA 中重新加载 `knowflow/pom.xml`，启动类使用 `KnowFlowApplication`，工作目录使用 `knowflow/`。
+- 核心类使用 `AgentRuntime` / `AgentRuntimeFactory`，前端布局组件使用 `AppLayout`。
+- 数据库默认名称仍为 `jchatmind`，继续通过 `DB_URL` 配置，以兼容现有数据；此次改名不执行数据库迁移。
+- 文档目录仍为后端工作目录下的 `data/documents`，已有文档随模块保留，历史知识库内容不自动替换。
+- API 路径、SSE 事件字段和业务表结构保持现有协议。
+- 仓库来源说明、版权声明及历史资料中的旧名保留。
 
-到项目实战：大模型怎么用、环境怎么搭，Agent loop如何设计，怎么引入知识库与RAG，以及MCP
+## 验证命令
 
-最后再到求职相关：项目的简历写法、项目亮点、本项目常见面试题，都给大家准备好了。
+在 `knowflow/` 中运行：
 
-从**项目源码到答疑，一条龙服务，不用担心学不会，有什么问题都可以在专属微信群提问**：（[知识星球](https://programmercarl.com/other/kstar.html)里每个项目都有专属答疑群）
+```powershell
+.\mvnw.cmd clean compile -DskipTests
+.\mvnw.cmd -Dtest=KnowFlowApplicationTests test
+```
 
-![](https://file1.kamacoder.com/i/web/2026-01-08_10-59-23.jpg)
+在 `ui/` 中运行：
 
-### 项目架构图
+```powershell
+npm run build
+npm run lint
+```
 
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-19-14.jpg)
+上下文测试不等同于真实数据库或外部模型端到端验证。`AgentRuntimeV1Test`、`AgentRuntimeV2Test` 会调用外部聊天模型，不作为默认验证命令。
 
-JChatMind 通过分层架构 + Agent 核心服务，把 AI 能力（模型、RAG、工具）抽象成可组合、可扩展的系统模块
+## 二次开发说明
 
-### 获取本专栏
-
-扫如下十元代金券，只需要 196元，加入[知识星球](https://programmercarl.com/other/kstar.html)，你将**获取20+套项目教程的专栏+源码+配套答疑**： （每个项目不到十元钱，而且**加入星球的服务远不止就这些项目**！）
-
-如果不知道[知识星球](https://programmercarl.com/other/kstar.html)对自己是否有帮助，可以进来看看，感受一下星球里的学习氛围，**三天（72h）内可以全额退款**！
-
-知识星球APP右上角 自己申请退款，一个小时到账 全程无套路， **记得是三天内（72h）才能退款**。
-
-### 项目专栏细节
-
-理论知识讲解：
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-02-38.jpg)
-
-循序渐进，带你做agent实战开发：
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-03-33.jpg)
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-03-57.jpg)
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-03-57.jpg)
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-04-20.jpg)
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-04-41.jpg)
-
-最后，求职相关，简历写法、相关面试题，技术亮点 都安排的明明白白：
-
-**技术亮点、性能指标、功能指标、技术指标**，都给大家列出，甚至，不同岗位（后端、算法、大模型）使用这个项目的简历写法，都列出来，让面试没有死角：
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-05-09.jpg)
-
-**技术选型的理由、技术难点、解决方案、技术成长点、深入解析计数原理**：
-
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-11-08.jpg)
-
-针对项目原理和项目实现都准备了相关面试题
-
-项目原理面试题以及回答：
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-15-22.jpg)
-
-项目实战面试题以及回答：
-![](https://file1.kamacoder.com/i/web/2026-01-08_11-14-09.jpg)
-
-
-### 项目亮点
-
-1、**真正的 Agent Loop（Think-Execute 循环 + 状态机**）
-
-不是“调用一次大模型就结束”，而是支持：
-
-* 多轮规划
-* 多轮工具调用
-* 状态管理（THINKING / EXECUTING / DONE / ERROR）
-* 错误处理与最大步数控制（防止无限循环）
-
-这里的技术点：“怎么避免 Agent 无限调用工具？怎么做状态管理？怎么做超时控制？”
-
-2、**工具系统（固定工具 + 可选工具，可扩展、可治理**）
-
-很多人做工具调用只是“写几个 if else”，JChatMind 的工具系统是“框架化”的：
-
-* 工具自动注册
-* 固定工具 / 可选工具分类管理
-* 可扩展：新增工具不改核心流程
-* 可控：禁用 Spring AI 自动执行，改为手动管理 ToolCalling 流程
-
-这里的技术点：“工具调用怎么做扩展？工具失败怎么处理？工具返回结果怎么进入对话历史？”
-
-这就是讲“系统设计”的地方。
-
-3、**RAG 知识库（PostgreSQL + pgvector**）
-
-RAG 不是 PPT 概念，JChatMind 是完整链路：
-
-* Markdown 文档解析、分块
-* Embedding 生成并落库
-* pgvector 相似度检索（<->）
-* ivfflat 索引优化，支持 10 万+向量
-
-而且最关键的点是：用 PostgreSQL 一套体系把结构化数据和向量数据都管了（部署简单、成本低、事务一致性好）
-
-4、**多模型支持（注册表模式 ChatClientRegistry**）
-
-项目不是“绑定一个模型”，而是：
-
-* DeepSeek / 智谱 AI 可切换
-* 统一 ChatClient 接口
-* 注册表模式管理模型实例（解耦创建与使用）
-* 便于未来扩展更多模型
-
-这里也涉及到：如果要加一个新模型要改哪些代码？怎么做到无侵入？
-
-5、**SSE 实时通信（执行过程实时可视化**）
-
-很多 Agent 项目体验很差：用户不知道系统在干嘛。
-
-JChatMind 用 SSE 做了：
-
-* 状态实时推送：THINKING / EXECUTING / DONE
-* 前端能实时看到“Agent 正在干啥”
-* 比 WebSocket 更简单，适合单向推送
-
-这里会涉及到：SSE 和 WebSocket 区别？连接怎么管理？超时怎么处理？并发怎么扛？
-
-这又是一套高质量八股 + 项目结合。
-
-
-### 学完本项目可以掌握什么？
-
-* AI Agent 核心：Think-Execute 循环（多轮规划 + 多轮工具调用）+ 状态机 + 超时/错误处理
-* 工具调用体系：可扩展工具框架（固定/可选工具）、工具注册与调度、手动接管 Spring AI 工具执行流程
-* RAG 全链路：Markdown 解析与分块 → Embedding 入库 → pgvector 相似度检索（索引优化、SQL 调优）
-* 多模型架构设计：ChatClientRegistry 注册表模式，支持 DeepSeek/智谱等模型动态切换与扩展
-* 后端工程能力：Spring Boot 分层架构、RESTful API、统一异常/响应、MyBatis 复杂 SQL + 自定义 TypeHandler（vector）
-* 实时通信：SSE 服务端推送、连接管理、执行状态实时展示
-* 可量化成果表达：响应 <2s、并发 100+、检索准确率 85%+ 这种“面试官一眼懂”的指标怎么做、怎么写、怎么讲
-
-
-### 加入知识星球获取本项目
-
-加入[知识星球](https://programmercarl.com/other/kstar.html) 获取本项目。
-
-加入[知识星球](https://mp.weixin.qq.com/s/iUiIRYlJvNqTsvfQXwK6FA)四大权益
-
-1、**高质量项目合集（C++ / Java / Go / Python / AI**）
-
-可以获得星球里 **20+ 套项目专栏资料，不仅有详细讲解，而且都配套专属答疑服务**。
-
-全网十分稀缺的  **C++ AI应用项目（AI应用服务平台），Go AI项目（GopherAI），Java AI项目（JChatMind**）。
-
-![](https://file1.kamacoder.com/i/web/2025-12-31_11-41-52.jpg)
-
-2、**精品八股PDF**
-
-速记八股帮助众多录友们，短时间内快速上岸：
-
-![](https://file1.kamacoder.com/i/web/2025-09-28_17-44-23.jpg)
-
-3、**独家资料 & 学习氛围**
-
-大厂面经、薪资报告、秋招投递总结表
-
-![](https://file1.kamacoder.com/i/web/2025-09-28_18-26-47.jpg)
-
-学习路线清晰，方向明确
-
-![](https://file1.kamacoder.com/i/web/2025-09-28_18-39-32.jpg)
-
-星球里全是志同道合的伙伴，学习氛围 🔥🔥🔥
-
-![](https://file1.kamacoder.com/i/web/2025-09-28_18-50-25.jpg)
-
-4、**卡哥 1v1 提问 & 简历修改**
-
-直接向我提问，面试疑惑、学习路线、职业规划一对一解答
-
-![](https://file1.kamacoder.com/i/web/2025-09-29_10-07-44.jpg)
-
-加入[知识星球](https://mp.weixin.qq.com/s/iUiIRYlJvNqTsvfQXwK6FA)后如果不满意，三天内（72h）可全额退款！
-
-## 环境变量配置（敏感信息脱敏说明）
-
-项目已对 `jchatmind/src/main/resources/application.yaml` 进行脱敏处理，真实密钥不再写入仓库，改为“占位符 + 环境变量”的方式：
-
-- `application.yaml` 中只保留 `键: ${ENV_VAR:默认值}` 形式的占位符，未设置环境变量时使用默认值（均为占位字符串）。
-- 本地开发可在 `jchatmind/src/main/resources/application-local.yaml`（已加入 `.gitignore`）中填写真实值，项目通过 `spring.profiles.include: optional:local` 自动加载；没有该文件时自动跳过，不影响启动。
-- 服务器部署时直接设置环境变量，例如 `DEEPSEEK_API_KEY=sk-xxx`、`MAIL_PASSWORD=xxx`。
-- 完整变量清单见仓库根目录 `.env.example`。
-
-> 重要：仓库历史提交中曾包含真实的 DeepSeek/智谱 API Key 和 QQ 邮箱授权码。即使现在已从源码删除，它们仍可以从 `git log` 中恢复。请务必到对应平台 **撤销/重置这些密钥**（DeepSeek 控制台、智谱开放平台、QQ 邮箱设置→账户→生成授权码），必要时可再用 `git filter-repo` 重写历史。
+展示或用于简历时，应分别说明原项目基础和个人贡献，并用实际提交记录、源码和验证结果支撑。项目改名本身不作为技术成果。

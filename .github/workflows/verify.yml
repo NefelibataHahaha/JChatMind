@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: jchatmind
+        working-directory: knowflow
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -31,13 +31,13 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
-          cache-dependency-path: jchatmind/pom.xml
+          cache-dependency-path: knowflow/pom.xml
 
       - name: Compile backend
         run: ./mvnw -B -ntp clean compile -DskipTests
 
       - name: Verify Spring context
-        run: ./mvnw -B -ntp -Dtest=JchatmindApplicationTests test
+        run: ./mvnw -B -ntp -Dtest=KnowFlowApplicationTests test
 
   frontend:
     name: Frontend typecheck and build

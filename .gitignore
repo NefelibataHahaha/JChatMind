@@ -11,7 +11,7 @@ __MACOSX/
 
 # 本地数据与生成输出
 /jchatmind_assert/
-/jchatmind/output.txt
+/knowflow/output.txt
 /JChatMind-30天深度学习讲义.md
 
 # 环境变量与本地敏感配置（切勿提交真实密钥）

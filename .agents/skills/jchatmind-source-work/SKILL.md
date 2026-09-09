@@ -1,9 +1,9 @@
 ---
 name: jchatmind-source-work
-description: Trace, explain, review, debug, or change the JChatMind Spring AI repository using its current source. Use for JChatMind Agent loops, tools, RAG, SSE, persistence, React integration, and project-based interview or learning tasks; do not use for generic Java or Spring questions unrelated to this checkout.
+description: Trace, explain, review, debug, or change the KnowFlow Spring AI repository using its current source. Use for KnowFlow Agent loops, tools, RAG, SSE, persistence, React integration, and project-based interview or learning tasks; do not use for generic Java or Spring questions unrelated to this checkout.
 ---
 
-# JChatMind source work
+# KnowFlow source work
 
 Produce a source-grounded result that matches the user's requested mode and the repository's real behavior.
 

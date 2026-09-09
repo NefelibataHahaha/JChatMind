@@ -1,4 +1,4 @@
-# JChatMind source workflow
+# KnowFlow source workflow
 
 Use this workflow for multi-file explanations, reviews, debugging, and implementation. Skip steps that do not affect the requested outcome.
 
@@ -15,9 +15,9 @@ Use these routes as starting points, then verify every hop in the current checko
 
 | Concern | Start here | Continue through |
 | --- | --- | --- |
-| Chat/Agent execution | `ChatMessageController` | `ChatEvent` → `ChatEventListener` → `JChatMindFactory.create(...)` → `JChatMind.run()` / think-execute loop |
-| Model selection | `ChatClientRegistry` | Agent configuration → factory lookup → constructed `JChatMind` instance |
-| Tool execution | `JChatMind` | model tool calls → `ToolCallingManager.executeToolCalls(...)` → tool response messages → next model turn |
+| Chat/Agent execution | `ChatMessageController` | `ChatEvent` → `ChatEventListener` → `AgentRuntimeFactory.create(...)` → `AgentRuntime.run()` / think-execute loop |
+| Model selection | `ChatClientRegistry` | Agent configuration → factory lookup → constructed `AgentRuntime` instance |
+| Tool execution | `AgentRuntime` | model tool calls → `ToolCallingManager.executeToolCalls(...)` → tool response messages → next model turn |
 | Knowledge retrieval | `KnowledgeTools.knowledgeQuery(...)` | `RagServiceImpl.similaritySearch(...)` → `ChunkBgeM3Mapper` → pgvector distance → serialized tool result |
 | Document ingestion | document controller/facade | Markdown parsing → chunking → embedding → `chunk_bge_m3` persistence |
 | SSE status | backend `SseService` emitters | message type/payload → browser `EventSource` → `AgentChatView` state → history rendering |
