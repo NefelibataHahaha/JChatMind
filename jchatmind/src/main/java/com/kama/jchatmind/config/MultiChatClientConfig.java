@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +17,7 @@ public class MultiChatClientConfig {
         return ChatClient.builder(deepSeekChatModel)
                 .defaultOptions(DeepSeekChatOptions.builder()
                         .model("deepseek-v4-flash")
+                        .internalToolExecutionEnabled(false)
                         .build())
                 .build();
     }
@@ -26,6 +28,7 @@ public class MultiChatClientConfig {
         return ChatClient.builder(deepSeekChatModel)
                 .defaultOptions(DeepSeekChatOptions.builder()
                         .model("deepseek-v4-pro")
+                        .internalToolExecutionEnabled(false)
                         .build())
                 .build();
     }
@@ -33,6 +36,11 @@ public class MultiChatClientConfig {
     // zhipuai
     @Bean("glm-4.6")
     public ChatClient zhiPuAiChatClient(ZhiPuAiChatModel zhiPuAiChatModel) {
-        return ChatClient.create(zhiPuAiChatModel);
+        return ChatClient.builder(zhiPuAiChatModel)
+                .defaultOptions(ZhiPuAiChatOptions.builder()
+                        .model("glm-4.6")
+                        .internalToolExecutionEnabled(false)
+                        .build())
+                .build();
     }
 }

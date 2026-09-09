@@ -207,6 +207,7 @@ public class JChatMindFactory {
                 agent.getName(),
                 agent.getDescription(),
                 agent.getSystemPrompt(),
+                agent.getModel(),
                 chatClient,
                 maxMessages,
                 memory,

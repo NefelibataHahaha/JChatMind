@@ -91,6 +91,7 @@ public class JChatMind {
                      String name,
                      String description,
                      String systemPrompt,
+                     String model,
                      ChatClient chatClient,
                      Integer maxMessages,
                      List<Message> memory,
@@ -132,6 +133,7 @@ public class JChatMind {
 
         // 关闭 SpringAI 自带的内部的工具调用自动执行功能
         this.chatOptions = DefaultToolCallingChatOptions.builder()
+                .model(model)
                 .internalToolExecutionEnabled(false)
                 .build();
 
